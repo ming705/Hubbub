@@ -41,7 +41,7 @@ class PostControllerSpec extends Specification {
         response.status == 404
 
     }
-
+/*
     def "Adding a valid new post to the timeline"() {
         given: "A user with posts in the db"
         User chuck = new User(
@@ -63,7 +63,29 @@ class PostControllerSpec extends Specification {
         Post.countByUser(chuck) == 1
 
     }
+*/
 
+	def "Adding a valid new post to the timeline"() {
+        given: "a mock post service"
+        def mockPostService = Mock(PostService)
+        1 * mockPostService.createPost(_, _) >> new Post(content: "Mock Post")
+        controller.postService = mockPostService
+
+        when:  "controller is invoked"
+        def result = controller.addPost(
+                "joe_cool",
+                "Posting up a storm")
+
+        then: "redirected to timeline, flash message tells us all is well"
+        flash.message ==~ /Added new post: Mock.*/
+        // With the custom URL mapping
+        //response.redirectedUrl == '/users/joe_cool'   
+
+        // Without the custom URL mapping, the check would be this:
+        response.redirectedUrl == '/post/timeline/joe_cool'   
+    }
+
+/*    
     def "Adding an invalid new post to the timeline"() {
         given: "A user with posts in the db"
         User chuck = new User(loginId: "chuck_norris", password: "password").save(failOnError: true)
@@ -81,6 +103,36 @@ class PostControllerSpec extends Specification {
         flash.message == "Invalid or empty post"
         response.redirectedUrl == "/post/timeline/${chuck.loginId}"
         Post.countByUser(chuck) == 0
+    }
+*/
+
+	def "Adding an invalid new post to the timeline"() {
+        given: "A user with posts in the db"
+        User chuck = new User(loginId: "chuck_norris", password: "password").save(failOnError: true)
+
+        and: "A post service that throws an exception with the given data"
+        def errorMsg = "Invalid or empty post"
+        def mockPostService = Mock(PostService)
+        controller.postService = mockPostService
+        1 * mockPostService.createPost(chuck.loginId, null) >> { throw new PostException(message: errorMsg) }
+
+        and: "A loginId parameter"
+        params.id = chuck.loginId
+
+        and: "Some content for the post"
+        params.content = null
+
+        when: "addPost is invoked"
+        def model = controller.addPost()
+
+        then: "our flash message and redirect confirms the success"
+        flash.message == errorMsg
+        // With the custom URL mapping
+        //response.redirectedUrl == "/users/${chuck.loginId}"
+        Post.countByUser(chuck) == 0
+
+        // Without the custom URL mapping, the check would be this:
+        response.redirectedUrl == "/post/timeline/${chuck.loginId}"
     }
 
     @Unroll                                             
