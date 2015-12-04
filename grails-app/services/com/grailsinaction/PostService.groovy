@@ -11,7 +11,6 @@ class PostException extends RuntimeException {
 class PostService {
 
     Post createPost(String loginId, String content) {
-    log.debug "loginId = $loginId; content = $content"
         def user = User.findByLoginId(loginId)
         if (user) {
             def post = new Post(content: content)
