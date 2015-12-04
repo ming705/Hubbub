@@ -21,3 +21,6 @@ if (Environment.isDevelopmentMode() && targetDir) {
     }
     logger("StackTrace", ERROR, ['FULL_STACKTRACE'], false)
 }
+
+// Logger config for interceptor
+logger 'grails.app.controllers.com.grailsinaction.LameSecurityInterceptor', DEBUG, ['STDOUT'], false

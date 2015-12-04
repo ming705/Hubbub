@@ -79,10 +79,10 @@ class PostControllerSpec extends Specification {
         then: "redirected to timeline, flash message tells us all is well"
         flash.message ==~ /Added new post: Mock.*/
         // With the custom URL mapping
-        //response.redirectedUrl == '/users/joe_cool'   
+        response.redirectedUrl == '/users/joe_cool'   
 
         // Without the custom URL mapping, the check would be this:
-        response.redirectedUrl == '/post/timeline/joe_cool'   
+        //response.redirectedUrl == '/post/timeline/joe_cool'   
     }
 
 /*    
@@ -128,11 +128,11 @@ class PostControllerSpec extends Specification {
         then: "our flash message and redirect confirms the success"
         flash.message == errorMsg
         // With the custom URL mapping
-        //response.redirectedUrl == "/users/${chuck.loginId}"
+        response.redirectedUrl == "/users/${chuck.loginId}"
         Post.countByUser(chuck) == 0
 
         // Without the custom URL mapping, the check would be this:
-        response.redirectedUrl == "/post/timeline/${chuck.loginId}"
+        //response.redirectedUrl == "/post/timeline/${chuck.loginId}"
     }
 
     @Unroll                                             
@@ -149,8 +149,8 @@ class PostControllerSpec extends Specification {
                                                                    
         where:                                                     
         suppliedId  |   expectedUrl                                
-        'joe_cool'  |   '/post/timeline/joe_cool'                  
-        null        |   '/post/timeline/chuck_norris'              
+        'joe_cool'  |   '/users/joe_cool'                  
+        null        |   '/users/chuck_norris'              
                                                                    
     }
 
